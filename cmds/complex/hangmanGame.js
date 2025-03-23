@@ -18,7 +18,7 @@ class HangmanGame {
       }
     }).join(' ');
   
-    return `${display} (${this.word.length})`;
+    return `${display} (${this.word.replace(/ /g, '').length})`;
   }
 
   guess(letter) {
