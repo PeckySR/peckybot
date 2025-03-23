@@ -1,6 +1,7 @@
-# ashesrobot
+# PeckyBot
 
-The Bot can only change the title or category of my stream for now.
+A heavily modified fork of AffectedAshes' ashesrobot for use in me and my
+friends' streams.
 
 ## Documentation
 
@@ -30,12 +31,6 @@ This command lists all commands which are added to the database for the specific
 
 The list of commands for every user with their inputs and cooldowns.
 
-### ChatGPT
-
-Give ChatGPT a specific prompt (can be a sentence too) or ask a question for example (5 minute cooldown per user)
-
-`!chatgpt <prompt>`
-
 ### Hangman
 
 Hangman Minigame (5 minute cooldown between each hangman game)
@@ -46,78 +41,47 @@ Hangman Minigame (5 minute cooldown between each hangman game)
 
 * `!guess <guess>`
   
-  for guessing a letter or the full name (5 second cooldown per user for a guess)
-
-### Translate
-
-Chinese Pokémon Names translated with Google Translate and you have to guess what the Pokémon name is in English (30 second cooldown between each translate game)
-
-* `!translate`
-  
-  starts the mingame
-
-* `!translate <guess>`
-* `!t <guess>`
-
-  for guessing the Pokémon name (5 second cooldown per user for a guess)
+  for guessing a letter or the full name
 
 ### Slots
 
-Emote Slots Minigame (60 second cooldown per user) 
+Emote Slots Minigame
 
 `!slots`
 
 ### Metronome
 
-Guess a random Gen 1 Pokemon Move (30 second cooldown per user)
+Guess a random Gen 1 Pokemon Move
 
 `!metronome <move>`
 
 ### Randmon
 
-Guess a random Gen 1 Pokemon (30 second cooldown per user) 
+Guess a random Gen 1 Pokemon
 
 `!randmon <mon>`
 
 ### Randrunner
 
-Get a random runner name (30 second cooldown per user)
+Get a random runner name
 
 `!randrunner`
 
 ### Roll
 
-Guess a random number between 1-4096 (30 second cooldown per user)
+Rolls a random number 1-max (inclusive)
 
-`!roll <1-4096>`
+`!roll <max>`
 
-### Define
+### Sroll
 
-Get the definition from Urban Dictionary (30 second cooldown per user)
+Rolls a random number 1-8192 (inclusive), 8192 is a win
 
-`!define <word>`
-
-### Randomfact
-
-Get a random fact (30 second cooldown per user)
-
-`!randomfact`
-
-### Weather
-
-Get the current weather for x city (30 second cooldown per user) 
-
-`!weather <city>`
+`!sroll`
 
 ### SRC
 
 Get the World Record or Personal Best from speedrun.com for a specified game, category and runner
 
-* `!wr <gameName>, <categoryName>, <variableName> - variableName does not have to be provided (e.g. ENG, JPN, Console, Emulator, etc)`
-* `!pb <gameName>, <categoryName>, <runnerName>`
-
-### Flail
-
-Flail Calculator for Gen 1-4
-
-`!flail <current max hp>`
+* `!getwr <gameName>, <categoryName>, <var0>/<var1> - vars do not have to be provided (e.g. ENG, JPN, Console, Emulator, etc)`
+* `!getpb <gameName>, <categoryName>, <runnerName>`
