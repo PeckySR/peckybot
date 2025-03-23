@@ -1,16 +1,57 @@
 // db.js
 
 const fs = require('fs');
+const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const { sanitizeInput } = require('../utils/sanitizer');
 
-// SQLite Database Connection
-const db = new sqlite3.Database('./data/database.db', (err) => {
+const DISK_DB_PATH = '/data/database.db';
+const REPO_DB_PATH = path.join(__dirname, '../data/database.db');
+
+// If persistent DB doesn't exist, copy from repo or seed fresh
+if (!fs.existsSync(DISK_DB_PATH)) {
+  if (fs.existsSync(REPO_DB_PATH)) {
+    console.log('📦 Copying database.db from repo to persistent disk...');
+    fs.mkdirSync(path.dirname(DISK_DB_PATH), { recursive: true });
+    fs.copyFileSync(REPO_DB_PATH, DISK_DB_PATH);
+  } else {
+    console.log('🌱 No database found — creating empty DB at /data/database.db');
+    fs.mkdirSync(path.dirname(DISK_DB_PATH), { recursive: true });
+    fs.writeFileSync(DISK_DB_PATH, '');
+  }
+}
+
+// Connect to persistent DB
+const db = new sqlite3.Database(DISK_DB_PATH, (err) => {
   if (err) console.error('DB Connection Error:', err.message);
-  else console.log('Connected to SQLite DB');
+  else {
+    console.log('✅ Connected to persistent SQLite DB');
+    seedIfNeeded();
+  }
 });
 
-// Graceful Shutdown Handler
+// Auto-create the `commands` table if missing
+function seedIfNeeded() {
+  db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='commands'`, (err, row) => {
+    if (err) return console.error('Error checking for commands table:', err.message);
+    if (!row) {
+      console.log('📖 Seeding fresh commands table...');
+      db.run(`
+        CREATE TABLE commands (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          commandname TEXT NOT NULL,
+          response TEXT NOT NULL,
+          channel TEXT NOT NULL
+        )
+      `, (err) => {
+        if (err) console.error('Error creating table:', err.message);
+        else console.log('✅ Commands table created');
+      });
+    }
+  });
+}
+
+// Graceful Shutdown
 async function handleExit() {
   return new Promise((resolve) => {
     db.close((err) => {
@@ -25,7 +66,7 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-// Command Database Functions
+// Command Functions
 function addCmd(target, msg, username, cb) {
   const match = /^!addcmd\s+(\S+)\s+(.+)/i.exec(msg);
   if (!match) return cb?.('Use: !addcmd <cmd> <response>');

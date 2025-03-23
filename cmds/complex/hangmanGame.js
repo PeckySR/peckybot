@@ -10,13 +10,15 @@ class HangmanGame {
   }
 
   hideWord() {
-    return this.word.split('').map(letter => {
+    const display = this.word.split('').map(letter => {
       if (letter === ' ') {
         return '|'; // Replace spaces with "|"
       } else {
         return (this.guesses.includes(letter) ? letter : '_');
       }
     }).join(' ');
+  
+    return `${display} (${this.word.length})`;
   }
 
   guess(letter) {
