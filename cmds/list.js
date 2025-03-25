@@ -45,8 +45,7 @@ const cmds = {
     },
   },
   '!cmds': {
-    cd: true,
-    cdTime: 30,
+    cd: false,
     run: (target, client, ctx) => {
       if (hasPerm(ctx)) {
         getCmds(target, (err, names) => {
@@ -82,15 +81,15 @@ const cmds = {
       client.say(target, res);
     },
   },
-  '!slots': { cd: true, cdTime: 5, run: slots },
+  '!slots': { cd: true, cdTime: 300, run: slots },
   '!hangman': { cd: false, run: handleHangman, postRun: setHangmanCooldown },
   '!guess': { cd: false, run: handleHangman },
-  '!metronome': { cd: true, cdTime: 5, run: metronome },
-  '!randmon': { cd: true, cdTime: 5, run: randmon },
-  '!roll': { cd: true, cdTime: 5, run: roll },
-  '!sroll': { cd: true, cdTime: 5, run: sroll },
-  '!randrunner': { cd: true, cdTime: 5, run: randrunner },
-  '!commands': { cd: true, cdTime: 5, run: cmdList }
+  '!metronome': { cd: true, cdTime: 300, run: metronome },
+  '!randmon': { cd: true, cdTime: 300, run: randmon },
+  '!roll': { cd: true, cdTime: 300, run: roll },
+  '!sroll': { cd: true, cdTime: 300, run: sroll },
+  '!randrunner': { cd: true, cdTime: 300, run: randrunner },
+  '!commands': { cd: false, run: cmdList }
 };
 
 module.exports = cmds;
