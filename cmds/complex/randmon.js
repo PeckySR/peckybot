@@ -45,7 +45,7 @@ const randmon = (target, client, ctx, msg) => {
 
   const userMon = sanitizedMsg.replace(/^!randmon\s+/, "").toLowerCase();
   if (userMon === sanitizeInput(mon.toLowerCase())) {
-    client.say(target, `@${ctx.username} Congrats, you won randmon!`);
+    client.say(target, `@${ctx.username} → Congrats, you won randmon!`);
   }
 };
 

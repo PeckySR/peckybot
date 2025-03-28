@@ -8,9 +8,9 @@ const sroll = (target, client, ctx, msg) => {
   const username = ctx.username;
 
   if (roll === 8192) {
-    client.say(target, `@${username} ✨${roll}✨`);
+    client.say(target, `@${username} → ✨${roll}✨`);
   } else {
-    client.say(target, `@${username} ${roll}`);
+    client.say(target, `@${username} → ${roll}`);
   }
 };
 

@@ -66,7 +66,7 @@ function endHangman(target, client, reason) {
   const originalWord = hangmanGame.originalWord;
 
   if (reason === 'inactivity') {
-    client.say(target, `Hangman game was running for too long. Next time try to be faster :). The word was: ${originalWord}. Next round starts in 5 minutes.`);
+    client.say(target, `Hangman game was running for too long. Next time try to be faster. The word was: ${originalWord}. Next round starts in 5 minutes.`);
   } else {
     client.say(target, `Hangman round over! You ${result}. The word was: ${originalWord}. Next round starts in 5 minutes.`);
   }
@@ -133,23 +133,23 @@ function handleHangman(target, client, context, msg) {
       const hangmanGame = hangmanChannel.game;
 
       if (guess === hangmanGame.word) {
-        client.say(target, `@${context.username} You guessed the word! Congratulations, you win!`);
+        client.say(target, `@${context.username} → You guessed the word! Congratulations, you win!`);
         endHangman(target, client, 'win');
       } else if (guess.length === 1) {
         const success = hangmanGame.guess(guess);
         if (success) {
-          client.say(target, `@${context.username} You guessed ${guess} . Hidden name: ${hangmanGame.hiddenWord}`);
+          client.say(target, `@${context.username} → You guessed ${guess} . Hidden name: ${hangmanGame.hiddenWord}`);
           if (hangmanGame.isGameOver()) {
             endHangman(target, client, 'loss');
           } else if (hangmanGame.isGameWon()) {
-            client.say(target, `@${context.username} You guessed the word! Congratulations, you win!`);
+            client.say(target, `@${context.username} → You guessed the word! Congratulations, you win!`);
             endHangman(target, client, 'win');
           }
         } else {
-          client.say(target, `@${context.username} You already guessed ${guess} .`);
+          client.say(target, `@${context.username} → You already guessed ${guess} .`);
         }
       } else {
-        client.say(target, `@${context.username} Please guess one letter or the correct word.`);
+        client.say(target, `@${context.username} → Please guess one letter or the correct word.`);
       }
     }
   }

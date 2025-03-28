@@ -24,7 +24,7 @@ const slots = (target, client, ctx) => {
   client.say(target, `@${ctx.username} → ${result}`);
 
   if (rolled.every(emote => emote === rolled[0])) {
-    client.say(target, `@${ctx.username} Congrats, you won slots!`);
+    client.say(target, `@${ctx.username} → Congrats, you won slots!`);
   }
 };
 

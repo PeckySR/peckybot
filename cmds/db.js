@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const { sanitizeInput } = require('../utils/sanitizer');
+const cmds = require('./list');
 
 const DISK_DB_PATH = '/data/database.db';
 const REPO_DB_PATH = path.join(__dirname, '../data/database.db');
@@ -68,64 +69,113 @@ process.on('SIGTERM', async () => {
 
 // Command Functions
 function addCmd(target, msg, username, cb) {
-  const match = /^!addcmd\s+(\S+)\s+(.+)/i.exec(msg);
-  if (!match) return cb?.('Use: !addcmd <cmd> <response>');
-
-  const [, rawCmd, rawRes] = match;
-  const cmd = sanitizeInput(rawCmd);
-  const res = sanitizeInput(rawRes);
-  const ch = target?.replace(/^#/, '');
-
-  if (!ch) return cb?.("Error: couldn't determine channel.");
-  if (!cmd || !res) return cb?.("Error: invalid command format.");
-
-  db.get('SELECT * FROM commands WHERE commandname = ? AND channel = ?', [cmd, ch], (err, row) => {
-    if (err) return cb?.(`DB Error: ${err.message}`);
-    if (row) return cb?.(`Cmd '${cmd}' already exists.`);
-    db.run(
-      'INSERT INTO commands (commandname, response, channel) VALUES (?, ?, ?)',
-      [cmd, res, ch],
-      (err) => {
-        if (err) return cb?.(`DB Error: ${err.message}`);
-        cb?.(`Cmd added: ${cmd}`);
-      }
-    );
-  });
+  handleCmdAction({
+    msg,
+    target,
+    username,
+    usage: '!addcmd <cmd> <response>',
+    pattern: /^!addcmd\s+(\S+)\s+(.+)/i,
+    requireExists: false,
+    action: ({ cmd, ch, extraArg: res }) => {
+      db.run(
+        'INSERT INTO commands (commandname, response, channel) VALUES (?, ?, ?)',
+        [cmd, res, ch],
+        (err) => {
+          if (err) return cb?.(`DB Error: ${err.message}`);
+          cb?.(`@${username} → ${cmd} has been added.`);
+        }
+      );
+    }
+  }, cb);
 }
 
 function editCmd(target, msg, username, cb) {
-  const match = /^!editcmd\s+(\S+)\s+(.+)/i.exec(msg);
-  if (!match) return cb?.('Use: !editcmd <cmd> <newResponse>');
+  handleCmdAction({
+    msg,
+    target,
+    username,
+    usage: '!editcmd <cmd> <newResponse>',
+    pattern: /^!editcmd\s+(\S+)\s+(.+)/i,
+    requireExists: true,
+    action: ({ cmd, ch, extraArg: res }) => {
+      db.run(
+        'UPDATE commands SET response = ? WHERE commandname = ? AND channel = ?',
+        [res, cmd, ch],
+        (err) => {
+          if (err) return cb?.(`DB Error: ${err.message}`);
+          cb?.(`@${username} → ${cmd} has been edited.`);
+        }
+      );
+    }
+  }, cb);
+}
 
-  const [, rawCmd, rawRes] = match;
-  const cmd = sanitizeInput(rawCmd);
-  const res = sanitizeInput(rawRes);
-  const ch = target?.replace(/^#/, '');
+function delCmd(target, msg, username, cb) {
+  handleCmdAction({
+    msg,
+    target,
+    username,
+    usage: '!delcmd <cmd>',
+    pattern: /^!delcmd\s+(\S+)$/i,
+    requireExists: true,
+    action: ({ cmd, ch }) => {
+      db.run(
+        'DELETE FROM commands WHERE commandname = ? AND channel = ?',
+        [cmd, ch],
+        (err) => {
+          if (err) return cb?.(`DB Error: ${err.message}`);
+          cb?.(`@${username} → ${cmd} has been deleted.`);
+        }
+      );
+    }
+  }, cb);
+}
 
-  if (!ch) return cb?.("Error: couldn't determine channel.");
+function isCmd(cmd, channel, cb) {
+  const ch = channel?.replace(/^#/, '');
+  if (!cmd || !ch) return cb(false); // or cb(new Error("Invalid input"))
 
-  db.run(
-    'UPDATE commands SET response = ? WHERE commandname = ? AND channel = ?',
-    [res, cmd, ch],
-    (err) => {
-      if (err) return cb?.(`DB Error: ${err.message}`);
-      cb?.(`Cmd edited: ${cmd}`);
+  db.get(
+    'SELECT 1 FROM commands WHERE commandname = ? AND channel = ?',
+    [cmd, ch],
+    (err, row) => {
+      if (err) return cb(false); // or log error
+      cb(!!row); // true if found, false otherwise
     }
   );
 }
 
-function delCmd(target, msg, username, cb) {
-  const match = /^!delcmd\s+(\S+)$/i.exec(msg);
-  if (!match) return cb?.('Use: !delcmd <cmd>');
+function isBuiltIn(cmd) {
+  return cmds.hasOwnProperty(cmd);
+}
 
-  const cmd = sanitizeInput(match[1]);
+function handleCmdAction({
+  msg,
+  target,
+  username,
+  usage,
+  pattern,
+  requireExists = null,
+  checkBuiltIn = true,
+  action,
+}, cb) {
+  const match = pattern.exec(msg);
+  if (!match) return cb?.(`@${username} → Use: ${usage}`);
+
+  const rawCmd = sanitizeInput(match[1]);
+  const extraArg = match[2] ? sanitizeInput(match[2]) : null;
   const ch = target?.replace(/^#/, '');
 
-  if (!ch) return cb?.("Error: couldn't determine channel.");
+  if (!rawCmd || !ch) return cb?.("Error: couldn't determine command or channel.");
+  if (checkBuiltIn && isBuiltIn(rawCmd)) return cb?.(`@${username} → ${rawCmd} is a built-in command and cannot be modified.`);
 
-  db.run('DELETE FROM commands WHERE commandname = ? AND channel = ?', [cmd, ch], (err) => {
-    if (err) return cb?.(`DB Error: ${err.message}`);
-    cb?.(`Cmd deleted: ${cmd}`);
+  isCmd(rawCmd, ch, (exists) => {
+    if (requireExists === true && !exists)
+      return cb?.(`@${username} → ${rawCmd} does not exist and cannot be modified.`);
+    if (requireExists === false && exists)
+      return cb?.(`@${username} → ${rawCmd} already exists.`);
+
+    action({ cmd: rawCmd, ch, extraArg });
   });
 }
 

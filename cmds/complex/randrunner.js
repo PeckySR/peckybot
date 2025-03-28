@@ -18,7 +18,7 @@ const randrunner = (target, client, ctx, msg) => {
 
   const userGuess = sanitizedMsg.replace(/^!randrunner\s+/, "").toLowerCase();
   if (userGuess === sanitizeInput(runner.toLowerCase())) {
-    client.say(target, `@${ctx.username} Congrats, you won randrunner!`);
+    client.say(target, `@${ctx.username} → Congrats, you won randrunner!`);
   }
 };
 

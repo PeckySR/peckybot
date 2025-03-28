@@ -16,7 +16,7 @@ const roll = (target, client, ctx, msg) => {
 
   const finalRoll = random.integer(1, rollMax);
 
-  client.say(target, `@${ctx.username} ${finalRoll}`);
+  client.say(target, `@${ctx.username} → ${finalRoll}`);
 };
 
 module.exports = { roll };

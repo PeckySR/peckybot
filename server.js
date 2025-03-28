@@ -46,12 +46,12 @@ async function onMsg(target, ctx, msg, self) {
   // First: Try built-in commands
   if (cmds[cmd]) {
     const data = cmds[cmd];
-    if (data.cd && isCd(user, cmd, cds)) {
-      const timeLeft = getCd(user, cmd, cds);
+    if (data.cd && isCd(target, user, cmd, cds)) {
+      const timeLeft = getCd(target, user, cmd, cds);
       return sendMsg(target, `@${user}, ${cmd} is on cooldown for ${timeLeft}s.`);
     }
     data.run(target, client, ctx, msg, cds, (reply) => sendMsg(target, reply));
-    if (data.cd) setCd(user, cmd, cds, data.cdTime);
+    if (data.cd) setCd(target, user, cmd, cds, data.cdTime);
     console.log(`* Ran ${cmd}`);
     return;
   }
@@ -60,11 +60,11 @@ async function onMsg(target, ctx, msg, self) {
   try {
     const dbCmd = await getCmdFromDB(target, cmd);
     if (dbCmd) {
-      if (isCd(user, cmd, cds)) return;
+      if (isCd(target, user, cmd, cds)) return;
       const response = dbCmd.response;
       if (response) {
         sendMsg(target, response);
-        setCd(user, cmd, cds, defaultCd);
+        setCd(target, user, cmd, cds, defaultCd);
         console.log(`* Ran ${cmd} (DB)`);
       } else {
         console.warn(`No response text found for DB command: ${cmd}`);

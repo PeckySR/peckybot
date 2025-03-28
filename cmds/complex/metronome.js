@@ -40,7 +40,7 @@ const metronome = (target, client, ctx, msg) => {
 
   const userMove = sanitizedMsg.replace(/^!metronome\s+/, "").toLowerCase();
   if (userMove === sanitizeInput(move.toLowerCase())) {
-    client.say(target, `@${ctx.username} Congrats, you won metronome!`);
+    client.say(target, `@${ctx.username} → Congrats, you won metronome!`);
   }
 };
 
