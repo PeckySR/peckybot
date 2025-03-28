@@ -146,7 +146,7 @@ function isCmd(cmd, channel, cb) {
 }
 
 function isBuiltIn(cmd) {
-  return cmds.hasOwnProperty(cmd);
+  return Object.prototype.hasOwnProperty.call(cmds, cmd);
 }
 
 function handleCmdAction({
