@@ -4,10 +4,30 @@ const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const { sanitizeInput } = require('../utils/sanitizer');
-const cmds = require('./list');
 
 const DISK_DB_PATH = '/data/database.db';
 const REPO_DB_PATH = path.join(__dirname, '../data/database.db');
+
+// Local list of built-in command names (case-sensitive, exact keys)
+const builtInCommands = [
+  '!addcmd',
+  '!editcmd',
+  '!delcmd',
+  '!cmds',
+  '!changetitle',
+  '!changegame',
+  '!getwr',
+  '!getpb',
+  '!slots',
+  '!hangman',
+  '!guess',
+  '!metronome',
+  '!randmon',
+  '!roll',
+  '!sroll',
+  '!randrunner',
+  '!commands'
+];
 
 // If persistent DB doesn't exist, copy from repo or seed fresh
 if (!fs.existsSync(DISK_DB_PATH)) {
@@ -146,7 +166,7 @@ function isCmd(cmd, channel, cb) {
 }
 
 function isBuiltIn(cmd) {
-  return Object.prototype.hasOwnProperty.call(cmds, cmd);
+  return builtInCommands.includes(cmd);
 }
 
 function handleCmdAction({
