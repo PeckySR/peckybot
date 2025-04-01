@@ -2,7 +2,7 @@
 
 const { hasPerm } = require('../utils/permissions');
 const { addCmd, editCmd, delCmd, getCmds } = require('./db');
-const { setTitle, setGame } = require('../data/streamUpdater');
+const { changeTitle, changeGame } = require('./stream');
 const { getWR, getPB } = require('./complex/src');
 const { slots } = require('./complex/slots');
 const { handleHangman, setHangmanCooldown } = require('./complex/hangmanBot');
@@ -66,11 +66,11 @@ const cmds = {
   },
   '!changetitle': { 
     cd: false, 
-    run: setTitle 
+    run: changeTitle 
   },
   '!changegame': { 
     cd: false, 
-    run: setGame 
+    run: changeGame 
   },
   '!getwr': {
     cd: false,
