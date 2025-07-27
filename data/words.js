@@ -65,7 +65,7 @@ const runners = [
     "LegendEater",
     "Leostarr3000",
     "linewashere",
-    "LionHeartDagger",
+    "lionheart_d",
     "LucasPGLP",
     "MachWing",
     "Maddiict",
