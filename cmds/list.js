@@ -107,11 +107,13 @@ const cmds = {
   },
   '!hangman': {
     cd: false,
+    shared: true,
     run: handleHangman,
     postRun: setHangmanCooldown
   },
   '!guess': {
     cd: false,
+    shared: true,
     run: handleHangman
   },
   '!metronome': {
