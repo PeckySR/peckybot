@@ -1,0 +1,43 @@
+Twitch token setup
+==================
+
+Env vars the bot reads:
+
+  BOT_USERNAME    the bot account's Twitch login
+  CHANNEL_LIST    comma-separated channels to join
+  CLIENT_ID       your app at https://dev.twitch.tv/console/apps
+  CLIENT_SECRET   same app, "New Secret"
+  REFRESH_TOKEN   from the one-time authorization below
+
+Access tokens expire after ~4 hours. The refresh token does not expire, so
+tokenStore.js trades it for a new access token as needed. Done once, below.
+
+1. Open this signed in AS THE BOT ACCOUNT, in a private window so you don't
+   authorize your personal account by mistake. redirect_uri must exactly match
+   one registered on the app.
+
+   https://id.twitch.tv/oauth2/authorize?client_id=CLIENT_ID&redirect_uri=http://localhost&response_type=code&scope=chat:read+chat:edit
+
+2. Approve. The browser fails to load http://localhost - that's expected.
+   Copy the code= value from the address bar. It expires within minutes.
+
+3. Trade it for a refresh token:
+
+   curl -X POST https://id.twitch.tv/oauth2/token \
+     -d client_id=CLIENT_ID \
+     -d client_secret=CLIENT_SECRET \
+     -d code=THE_CODE \
+     -d grant_type=authorization_code \
+     -d redirect_uri=http://localhost
+
+4. Put refresh_token from the response into REFRESH_TOKEN.
+
+Verify any token with:
+
+   curl -H "Authorization: OAuth TOKEN" https://id.twitch.tv/oauth2/validate
+
+login should be the bot account, scopes chat:read + chat:edit.
+
+A refresh token only dies if the bot's password changes, the app is
+disconnected, or the client secret is rotated. Redo steps 1-4 and update
+REFRESH_TOKEN; the new value overrides whatever is cached in the database.

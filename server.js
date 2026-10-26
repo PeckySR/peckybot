@@ -5,13 +5,16 @@ const cmds = require('./cmds/list');
 const { isCd, getCd, setCd } = require('./cmds/cd');
 const { getCmdFromDB, defaultCd } = require('./cmds/db');
 const { noteRoom, resolveRooms } = require('./utils/sharedChat');
+const { getFreshToken } = require('./data/tokenStore');
 
 const cds = {};
 
 const opts = {
   identity: {
     username: process.env.BOT_USERNAME,
-    password: process.env.OAUTH_TOKEN
+    // tmi.js calls this on every connect and reconnect, so a token that lapses
+    // mid-session is replaced automatically on the way back up.
+    password: async () => `oauth:${await getFreshToken()}`
   },
   channels: process.env.CHANNEL_LIST ? process.env.CHANNEL_LIST.split(',') : [],
   joinInterval: 3000,
@@ -21,7 +24,13 @@ const client = new tmi.client(opts);
 client.on('message', onMsg);
 client.on('connected', onConnect);
 client.on('roomstate', (channel, tags) => noteRoom(channel, tags['room-id']));
-client.connect();
+// tmi.js rejects (and does not retry) on a fatal login failure. Without this
+// catch the rejection is unhandled, the process dies, and Render restart-loops
+// a web server and DB that were both perfectly healthy.
+client.connect().catch(err => {
+  console.error('Twitch chat connection failed:', err);
+  console.error('Chat is offline, web server still up. Check CLIENT_ID / CLIENT_SECRET / REFRESH_TOKEN / BOT_USERNAME.');
+});
 
 async function resolveAlias(target, msg, depth = 0) {
   if (depth > 5) return msg; // Prevent infinite loops

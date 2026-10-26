@@ -2,7 +2,6 @@
 
 const { hasPerm } = require('../utils/permissions');
 const { addCmd, editCmd, delCmd, getCmds } = require('./db');
-const { changeTitle, changeGame } = require('./stream');
 const { getWR, getPB } = require('./complex/src');
 const { slots } = require('./complex/slots');
 const { handleHangman, setHangmanCooldown } = require('./complex/hangmanBot');
@@ -63,14 +62,6 @@ const cmds = {
         client.say(target, res);
       });
     },
-  },
-  '!changetitle': { 
-    cd: false, 
-    run: changeTitle 
-  },
-  '!changegame': { 
-    cd: false, 
-    run: changeGame 
   },
   '!getwr': {
     cd: false,

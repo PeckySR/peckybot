@@ -14,8 +14,6 @@ const builtInCommands = [
   '!editcmd',
   '!delcmd',
   '!cmds',
-  '!changetitle',
-  '!changegame',
   '!getwr',
   '!getpb',
   '!slots',
@@ -230,6 +228,7 @@ function getCmdFromDB(target, cmd) {
 const defaultCd = 10;
 
 module.exports = {
+  db,
   addCmd,
   editCmd,
   delCmd,
